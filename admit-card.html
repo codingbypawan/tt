@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admit Card - Gurukul Shikshan Sansthan</title>
+    <style>
+        @page {
+            size: A4 portrait;
+            margin: 5mm 8mm;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            font-size: 11px;
+            color: #000;
+            background: #f0f0f0;
+        }
+
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto 10px auto;
+            background: #fff;
+            padding: 5mm 8mm;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 0;
+        }
+
+        .card-wrapper {
+            width: 100%;
+            height: 93mm;
+            padding-top: 3mm;
+            padding-bottom: 3mm;
+            border-bottom: 1.5px dashed #aaa;
+            position: relative;
+        }
+
+        .card-wrapper:last-child {
+            border-bottom: none;
+        }
+
+        .card-wrapper::after {
+            content: '✂';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            font-size: 12px;
+            color: #999;
+            line-height: 1;
+        }
+
+        .card-wrapper:last-child::after {
+            display: none;
+        }
+
+        .card {
+            width: 100%;
+            height: 100%;
+            border: 1.5px solid #888;
+            padding: 3mm 5mm;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            page-break-inside: avoid;
+        }
+
+        .card-header {
+            text-align: center;
+            border-bottom: 1.5px solid #000;
+            padding-bottom: 2px;
+            margin-bottom: 3px;
+        }
+
+        .school-name {
+            font-size: 15px;
+            font-weight: bold;
+            color: #000;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .school-address {
+            font-size: 9px;
+            color: #333;
+            margin-top: 1px;
+        }
+
+        .exam-title {
+            font-size: 11px;
+            font-weight: bold;
+            color: #000;
+            margin-top: 2px;
+            text-decoration: underline;
+        }
+
+        .student-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1px 10px;
+            padding: 2px 0;
+            border-bottom: 1px solid #ccc;
+            margin-bottom: 2px;
+        }
+
+        .student-info .info-item {
+            font-size: 10px;
+            line-height: 1.4;
+        }
+
+        .info-item .label {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .info-item .value {
+            color: #000;
+        }
+
+        .shift-text {
+            font-size: 9px;
+            font-weight: bold;
+        }
+
+        .timetable {
+            flex: 1;
+            margin-top: 1px;
+        }
+
+        .timetable table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 9.5px;
+        }
+
+        .timetable th {
+            background-color: #000;
+            color: #fff;
+            padding: 2px 4px;
+            text-align: center;
+            font-size: 9px;
+            border: 1px solid #333;
+        }
+
+        .timetable td {
+            padding: 1.5px 4px;
+            border: 1px solid #999;
+            text-align: center;
+        }
+
+        .timetable tr:nth-child(even) td {
+            background-color: #f5f5f5;
+        }
+
+        .timetable .date-col {
+            font-weight: bold;
+            width: 35%;
+            white-space: nowrap;
+        }
+
+        .timetable .day-col {
+            width: 25%;
+            color: #555;
+            font-size: 9px;
+        }
+
+        .timetable .subject-col {
+            font-weight: 500;
+            text-align: left;
+            padding-left: 8px;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: auto;
+            padding-top: 2px;
+            font-size: 9px;
+        }
+
+        .card-footer .note {
+            font-style: italic;
+            color: #555;
+            font-size: 8px;
+        }
+
+        .card-footer .signature {
+            text-align: center;
+            min-width: 120px;
+        }
+
+        .card-footer .signature .line {
+            border-top: 1px solid #000;
+            margin-top: 10px;
+            padding-top: 1px;
+            font-weight: bold;
+            font-size: 8px;
+        }
+
+        /* Screen only styles */
+        @media screen {
+            .page {
+                box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+                margin-bottom: 20px;
+            }
+
+            .controls {
+                text-align: center;
+                padding: 15px;
+                background: #1a237e;
+                color: #fff;
+                position: sticky;
+                top: 0;
+                z-index: 100;
+            }
+
+            .controls button {
+                padding: 8px 20px;
+                font-size: 14px;
+                background: #fff;
+                color: #1a237e;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                font-weight: bold;
+                margin: 0 5px;
+            }
+
+            .controls button:hover {
+                background: #e0e0e0;
+            }
+
+            .controls select {
+                padding: 7px 12px;
+                font-size: 13px;
+                border-radius: 4px;
+                border: none;
+                margin: 0 5px;
+            }
+
+            .controls span {
+                margin: 0 10px;
+                font-size: 14px;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                background: #fff;
+            }
+
+            .controls {
+                display: none !important;
+            }
+
+            .page {
+                margin: 0;
+                padding: 3mm 6mm;
+                box-shadow: none;
+                page-break-after: always;
+                min-height: auto;
+                height: 297mm;
+            }
+
+            .card-wrapper {
+                border-bottom: 1.5px dashed #aaa !important;
+            }
+
+            .card-wrapper:last-child {
+                border-bottom: none !important;
+            }
+
+            .card-wrapper::after {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .page:last-child {
+                page-break-after: auto;
+            }
+
+            .card {
+                border: 1.5px dashed #888;
+            }
+
+            * {
+                color: #000 !important;
+            }
+
+            .timetable th {
+                background-color: #000 !important;
+                color: #fff !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .timetable tr:nth-child(even) td {
+                background-color: #eee !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="controls" id="controls">
+        <span>🏫 Gurukul Shikshan Sansthan — Admit Card Generator</span>
+        <select id="classFilter">
+            <option value="all">All Classes</option>
+        </select>
+        <button onclick="window.print()">🖨️ Print Admit Cards</button>
+        <span id="countDisplay"></span>
+    </div>
+    <div id="cardsContainer"></div>
+
+    <script>
+        // Timetables
+        const timetableClass9 = [
+            { date: '13/03/2026', day: 'Friday', subject: 'Hindi' },
+            { date: '14/03/2026', day: 'Saturday', subject: 'Maths' },
+            { date: '16/03/2026', day: 'Monday', subject: 'English' },
+            { date: '18/03/2026', day: 'Wednesday', subject: 'Science' },
+            { date: '20/03/2026', day: 'Friday', subject: 'Social Science' },
+            { date: '23/03/2026', day: 'Monday', subject: 'Art' }
+        ];
+
+        const timetableClass3to8 = [
+            { date: '13/03/2026', day: 'Friday', subject: 'Hindi' },
+            { date: '14/03/2026', day: 'Saturday', subject: 'English' },
+            { date: '16/03/2026', day: 'Monday', subject: 'Maths' },
+            { date: '17/03/2026', day: 'Tuesday', subject: 'Science' },
+            { date: '18/03/2026', day: 'Wednesday', subject: 'Social Science' },
+            { date: '19/03/2026', day: 'Thursday', subject: 'Sanskrit' },
+            { date: '20/03/2026', day: 'Friday', subject: 'GK/Moral Science' },
+            { date: '23/03/2026', day: 'Monday', subject: 'Art' }
+        ];
+
+        const timetableLKGUKG = [
+            { date: '13/03/2026', day: 'Friday', subject: 'Hindi Written' },
+            { date: '14/03/2026', day: 'Saturday', subject: 'Hindi Oral' },
+            { date: '16/03/2026', day: 'Monday', subject: 'English Written' },
+            { date: '17/03/2026', day: 'Tuesday', subject: 'English Oral' },
+            { date: '18/03/2026', day: 'Wednesday', subject: 'Maths Written' },
+            { date: '19/03/2026', day: 'Thursday', subject: 'Maths Oral' },
+            { date: '20/03/2026', day: 'Friday', subject: 'Physical/Musical' }
+        ];
+
+        const timetableClass1 = [
+            { date: '13/03/2026', day: 'Friday', subject: 'Hindi Written' },
+            { date: '14/03/2026', day: 'Saturday', subject: 'Hindi Oral' },
+            { date: '16/03/2026', day: 'Monday', subject: 'English Written' },
+            { date: '17/03/2026', day: 'Tuesday', subject: 'English Oral' },
+            { date: '18/03/2026', day: 'Wednesday', subject: 'Maths Written' },
+            { date: '19/03/2026', day: 'Thursday', subject: 'Maths Oral' },
+            { date: '20/03/2026', day: 'Friday', subject: 'Physical/Musical' },
+            { date: '23/03/2026', day: 'Monday', subject: 'Art' }
+        ];
+
+        const timetableClass2 = [
+            { date: '13/03/2026', day: 'Friday', subject: 'Hindi' },
+            { date: '14/03/2026', day: 'Saturday', subject: 'English' },
+            { date: '16/03/2026', day: 'Monday', subject: 'Maths' },
+            { date: '17/03/2026', day: 'Tuesday', subject: 'Science' },
+            { date: '18/03/2026', day: 'Wednesday', subject: 'Social Science' },
+            { date: '19/03/2026', day: 'Thursday', subject: 'Sanskrit' },
+            { date: '20/03/2026', day: 'Friday', subject: 'GK/Moral Science' },
+            { date: '23/03/2026', day: 'Monday', subject: 'Art' }
+        ];
+
+        // Parse class string to get numeric/code value
+        function getClassCode(classStr) {
+            if (!classStr) return '';
+            const code = classStr.replace(/\s*[A-B]$/, '').trim();
+            return code;
+        }
+
+        function getClassNumber(classCode) {
+            const mapping = {
+                'LKG': 0, 'UKG': 0.5,
+                'I': 1, 'II': 2, 'III': 3, 'IV': 4, 'V': 5,
+                'VI': 6, 'VII': 7, 'VIII': 8, 'IX': 9, 'X': 10
+            };
+            return mapping[classCode] !== undefined ? mapping[classCode] : -1;
+        }
+
+        function getTimetable(classCode) {
+            const num = getClassNumber(classCode);
+            if (num === 0 || num === 0.5) return timetableLKGUKG; // LKG, UKG
+            if (num === 1) return timetableClass1;
+            if (num === 2) return timetableClass2;
+            if (num >= 3 && num <= 8) return timetableClass3to8;
+            if (num === 9) return timetableClass9;
+            if (num === 10) return timetableClass3to8; // Class 10 follows 3-8 pattern
+            return timetableClass3to8;
+        }
+
+        function getShift(classCode) {
+            const num = getClassNumber(classCode);
+            // LKG, UKG, 1, 2 = Morning
+            if (num <= 2) {
+                return { name: 'Morning', time: '9:00 AM to 11:15 AM' };
+            }
+            // 3 to 10 = Afternoon
+            return { name: 'Afternoon', time: '11:45 AM to 1:45 PM' };
+        }
+
+        function formatDate(dateStr) {
+            return dateStr;
+        }
+
+        function createCard(student) {
+            const classCode = getClassCode(student.class2025);
+            const timetable = getTimetable(classCode);
+            const shift = getShift(classCode);
+
+            let timetableRows = timetable.map(item =>
+                `<tr>
+                    <td class="date-col">${item.date}</td>
+                    <td class="day-col">${item.day}</td>
+                    <td class="subject-col">${item.subject}</td>
+                </tr>`
+            ).join('');
+
+            return `
+            <div class="card">
+                <div class="card-header">
+                    <div class="school-name">Gurukul Shikshan Sansthan</div>
+                    <div class="school-address">Khampar (Jaipur), Deoria (U.P.)</div>
+                    <div class="exam-title">Annual Examination 2025-26 — ADMIT CARD</div>
+                </div>
+                <div class="student-info">
+                    <div class="info-item"><span class="label">Student Name: </span><span class="value">${student.name.trim()}</span></div>
+                    <div class="info-item"><span class="label">Father's Name: </span><span class="value">${student.father_name.trim()}</span></div>
+                    <div class="info-item"><span class="label">Class: </span><span class="value">${student.class2025}</span> &nbsp; <span class="label">Roll No: </span><span class="value">${student.roll2025}</span></div>
+                    <div class="info-item"><span class="label">Adm. No: </span><span class="value">${student.adm_no}</span> &nbsp; <span class="shift-text">Shift: ${shift.name} (${shift.time})</span></div>
+                </div>
+                <div class="timetable">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Day</th>
+                                <th>Subject</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${timetableRows}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer">
+                    <div class="note">Note: Bring this card on every exam day.</div>
+                    <div class="signature">
+                        <div class="line">Principal's Signature</div>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        function renderCards(students) {
+            const container = document.getElementById('cardsContainer');
+            container.innerHTML = '';
+
+            // Sort students by class then roll number
+            const classOrder = { 'LKG': 1, 'UKG': 2, 'I': 3, 'II': 4, 'III': 5, 'IV': 6, 'V': 7, 'VI': 8, 'VII': 9, 'VIII': 10, 'IX': 11, 'X': 12 };
+
+            students.sort((a, b) => {
+                const codeA = getClassCode(a.class2025);
+                const codeB = getClassCode(b.class2025);
+                const orderA = classOrder[codeA] || 99;
+                const orderB = classOrder[codeB] || 99;
+                if (orderA !== orderB) return orderA - orderB;
+                // Same class, compare section
+                const secA = a.class2025.replace(codeA, '').trim();
+                const secB = b.class2025.replace(codeB, '').trim();
+                if (secA !== secB) return secA.localeCompare(secB);
+                // Same section, sort by roll number
+                return parseInt(a.roll2025) - parseInt(b.roll2025);
+            });
+
+            // Group into pages of 3 cards
+            for (let i = 0; i < students.length; i += 3) {
+                const page = document.createElement('div');
+                page.className = 'page';
+
+                for (let j = i; j < Math.min(i + 3, students.length); j++) {
+                    page.innerHTML += `<div class="card-wrapper">${createCard(students[j])}</div>`;
+                }
+
+                container.appendChild(page);
+            }
+
+            document.getElementById('countDisplay').textContent = `Total: ${students.length} students | ${Math.ceil(students.length / 3)} pages`;
+        }
+
+        function populateFilter(students) {
+            const select = document.getElementById('classFilter');
+            const classes = [...new Set(students.map(s => s.class2025))];
+
+            const classOrder = { 'LKG': 1, 'UKG': 2, 'I': 3, 'II': 4, 'III': 5, 'IV': 6, 'V': 7, 'VI': 8, 'VII': 9, 'VIII': 10, 'IX': 11, 'X': 12 };
+            classes.sort((a, b) => {
+                const codeA = getClassCode(a);
+                const codeB = getClassCode(b);
+                const orderA = classOrder[codeA] || 99;
+                const orderB = classOrder[codeB] || 99;
+                if (orderA !== orderB) return orderA - orderB;
+                return a.localeCompare(b);
+            });
+
+            classes.forEach(cls => {
+                const opt = document.createElement('option');
+                opt.value = cls;
+                opt.textContent = cls;
+                select.appendChild(opt);
+            });
+
+            select.addEventListener('change', function () {
+                const val = this.value;
+                if (val === 'all') {
+                    renderCards(allStudents);
+                } else {
+                    renderCards(allStudents.filter(s => s.class2025 === val));
+                }
+            });
+        }
+
+        let allStudents = [];
+
+        // Load student data
+        fetch('student.json')
+            .then(res => res.json())
+            .then(data => {
+                allStudents = data;
+                populateFilter(allStudents);
+                renderCards(allStudents);
+            })
+            .catch(err => {
+                console.error('Error loading student.json:', err);
+                document.getElementById('cardsContainer').innerHTML =
+                    '<p style="text-align:center;padding:40px;color:red;font-size:16px;">Error: Could not load student.json.<br>Please make sure this file is served via a web server (e.g., Live Server in VS Code) and student.json is in the same folder.</p>';
+            });
+    </script>
+</body>
+</html>
