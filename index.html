@@ -18,7 +18,7 @@
 
         body {
             font-family: 'Arial', sans-serif;
-            font-size: 11px;
+            font-size: 12px;
             color: #000;
             background: #f0f0f0;
         }
@@ -28,18 +28,17 @@
             min-height: 297mm;
             margin: 0 auto 10px auto;
             background: #fff;
-            padding: 5mm 8mm;
+            padding: 4mm 8mm;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            justify-content: flex-start;
             gap: 0;
         }
 
         .card-wrapper {
             width: 100%;
-            height: 93mm;
-            padding-top: 3mm;
-            padding-bottom: 3mm;
+            height: calc((297mm - 8mm) / 3);
+            padding: 2mm 0;
             border-bottom: 1.5px dashed #aaa;
             position: relative;
         }
@@ -82,7 +81,7 @@
         }
 
         .school-name {
-            font-size: 15px;
+            font-size: 18px;
             font-weight: bold;
             color: #000;
             text-transform: uppercase;
@@ -90,13 +89,13 @@
         }
 
         .school-address {
-            font-size: 9px;
+            font-size: 12px;
             color: #333;
             margin-top: 1px;
         }
 
         .exam-title {
-            font-size: 11px;
+            font-size: 14px;
             font-weight: bold;
             color: #000;
             margin-top: 2px;
@@ -113,8 +112,8 @@
         }
 
         .student-info .info-item {
-            font-size: 10px;
-            line-height: 1.4;
+            font-size: 12.5px;
+            line-height: 1.5;
         }
 
         .info-item .label {
@@ -127,7 +126,7 @@
         }
 
         .shift-text {
-            font-size: 9px;
+            font-size: 11.5px;
             font-weight: bold;
         }
 
@@ -139,15 +138,15 @@
         .timetable table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 9.5px;
+            font-size: 12px;
         }
 
         .timetable th {
             background-color: #000;
             color: #fff;
-            padding: 2px 4px;
+            padding: 2.5px 4px;
             text-align: center;
-            font-size: 9px;
+            font-size: 11.5px;
             border: 1px solid #333;
         }
 
@@ -170,7 +169,7 @@
         .timetable .day-col {
             width: 25%;
             color: #555;
-            font-size: 9px;
+            font-size: 11.5px;
         }
 
         .timetable .subject-col {
@@ -191,7 +190,7 @@
         .card-footer .note {
             font-style: italic;
             color: #555;
-            font-size: 8px;
+            font-size: 10px;
         }
 
         .card-footer .signature {
@@ -204,7 +203,7 @@
             margin-top: 10px;
             padding-top: 1px;
             font-weight: bold;
-            font-size: 8px;
+            font-size: 10px;
         }
 
         /* Screen only styles */
@@ -266,11 +265,15 @@
 
             .page {
                 margin: 0;
-                padding: 3mm 6mm;
+                padding: 4mm 6mm;
                 box-shadow: none;
                 page-break-after: always;
                 min-height: auto;
                 height: 297mm;
+            }
+
+            .card-wrapper {
+                height: calc((297mm - 8mm) / 3) !important;
             }
 
             .card-wrapper {
@@ -553,4 +556,3 @@
     </script>
 </body>
 </html>
-
