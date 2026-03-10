@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Payment List</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .filters {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            color: #555;
+            font-size: 14px;
+        }
+
+        select {
+            padding: 12px 20px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            min-width: 200px;
+            cursor: pointer;
+            background: white;
+            transition: border-color 0.3s;
+        }
+
+        select:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+
+        .btn-print {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            align-self: flex-end;
+        }
+
+        .btn-print:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .summary {
+            background: #f8f9fa;
+            padding: 15px 25px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .summary-item {
+            font-size: 16px;
+            color: #555;
+        }
+
+        .summary-item strong {
+            color: #333;
+        }
+
+        .count {
+            background: #667eea;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        th {
+            color: white;
+            padding: 15px 10px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .roll-col {
+            width: 60px;
+            text-align: center;
+        }
+
+        .sno-col {
+            width: 50px;
+            text-align: center;
+        }
+
+        .status-paid {
+            color: #28a745;
+            font-weight: 600;
+        }
+
+        .status-not-paid {
+            color: #dc3545;
+            font-weight: 600;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 50px;
+            color: #888;
+            font-size: 18px;
+        }
+
+        .print-header {
+            display: none;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .print-header h2 {
+            font-size: 22px;
+            margin-bottom: 5px;
+        }
+
+        .print-header p {
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* Print Styles - A4 Paper */
+        @media print {
+            @page {
+                size: A4;
+                margin: 15mm;
+            }
+
+            body {
+                background: white;
+                padding: 0;
+                font-size: 11pt;
+            }
+
+            .container {
+                box-shadow: none;
+                padding: 0;
+                max-width: 100%;
+            }
+
+            h1 {
+                display: none;
+            }
+
+            .filters {
+                display: none;
+            }
+
+            .btn-print {
+                display: none;
+            }
+
+            .print-header {
+                display: block;
+            }
+
+            .summary {
+                background: #f0f0f0;
+                padding: 10px 15px;
+                border: 1px solid #ddd;
+            }
+
+            table {
+                font-size: 10pt;
+            }
+
+            thead {
+                background: #333 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            th {
+                padding: 10px 8px;
+                background: #333 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            td {
+                padding: 8px;
+                border: 1px solid #ddd;
+            }
+
+            tr:nth-child(even) {
+                background: #f9f9f9 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .status-paid {
+                color: #000 !important;
+            }
+
+            .status-not-paid {
+                color: #000 !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Student Payment List</h1>
+
+        <div class="filters">
+            <div class="filter-group">
+                <label for="classSelect">Select Class</label>
+                <select id="classSelect">
+                    <option value="">-- Select Class --</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="paymentSelect">Payment Status</label>
+                <select id="paymentSelect">
+                    <option value="">-- Select Status --</option>
+                    <option value="YES">Paid</option>
+                    <option value="NO">Not Paid</option>
+                </select>
+            </div>
+
+            <button class="btn-print" onclick="window.print()">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M2.5 8a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
+                    <path d="M5 1a2 2 0 0 0-2 2v2H2a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1v1a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1V3a2 2 0 0 0-2-2H5zM4 3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2H4V3zm1 5a2 2 0 0 0-2 2v1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v-1a2 2 0 0 0-2-2H5zm7 2v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1z"/>
+                </svg>
+                Print List
+            </button>
+        </div>
+
+        <div class="print-header">
+            <h2>Student Payment List</h2>
+            <p id="printInfo"></p>
+        </div>
+
+        <div class="summary" id="summary" style="display: none;">
+            <div class="summary-item">
+                <strong>Class:</strong> <span id="selectedClass">-</span>
+            </div>
+            <div class="summary-item">
+                <strong>Status:</strong> <span id="selectedStatus">-</span>
+            </div>
+            <div class="summary-item">
+                <strong>Total Students:</strong> <span class="count" id="totalCount">0</span>
+            </div>
+        </div>
+
+        <div id="tableContainer">
+            <p class="no-data">Please select Class and Payment Status to view students.</p>
+        </div>
+    </div>
+
+    <script>
+        let studentsData = [];
+
+        // Load JSON data
+        async function loadData() {
+            try {
+                const response = await fetch('paid.json');
+                const jsonData = await response.json();
+                
+                // Extract student data from the JSON structure
+                const tableData = jsonData.find(item => item.type === 'table' && item.name === 's');
+                if (tableData && tableData.data) {
+                    studentsData = tableData.data;
+                    populateClassDropdown();
+                }
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.getElementById('tableContainer').innerHTML = 
+                    '<p class="no-data">Error loading data. Please make sure paid.json is in the same folder.</p>';
+            }
+        }
+
+        // Populate class dropdown with unique classes
+        function populateClassDropdown() {
+            const classSelect = document.getElementById('classSelect');
+            const classes = [...new Set(studentsData.map(s => s.class2025))].sort((a, b) => {
+                // Custom sort for class names (I A, II A, III A, etc.)
+                const order = {'I': 1, 'II': 2, 'III': 3, 'IV': 4, 'V': 5, 'VI': 6, 'VII': 7, 'VIII': 8, 'IX': 9, 'X': 10};
+                const [classA] = a.split(' ');
+                const [classB] = b.split(' ');
+                return (order[classA] || 99) - (order[classB] || 99);
+            });
+
+            classes.forEach(cls => {
+                const option = document.createElement('option');
+                option.value = cls;
+                option.textContent = cls;
+                classSelect.appendChild(option);
+            });
+        }
+
+        // Filter and display students
+        function filterStudents() {
+            const selectedClass = document.getElementById('classSelect').value;
+            const selectedPayment = document.getElementById('paymentSelect').value;
+            const summary = document.getElementById('summary');
+            const tableContainer = document.getElementById('tableContainer');
+
+            if (!selectedClass || !selectedPayment) {
+                summary.style.display = 'none';
+                tableContainer.innerHTML = '<p class="no-data">Please select Class and Payment Status to view students.</p>';
+                return;
+            }
+
+            const filteredStudents = studentsData
+                .filter(s => s.class2025 === selectedClass && s.Paid === selectedPayment)
+                .sort((a, b) => parseInt(a.roll2025) - parseInt(b.roll2025));
+
+            // Update summary
+            document.getElementById('selectedClass').textContent = selectedClass;
+            document.getElementById('selectedStatus').textContent = selectedPayment === 'YES' ? 'Paid' : 'Not Paid';
+            document.getElementById('totalCount').textContent = filteredStudents.length;
+            
+            // Update print header
+            const statusText = selectedPayment === 'YES' ? 'Paid' : 'Not Paid';
+            document.getElementById('printInfo').textContent = 
+                `Class: ${selectedClass} | Status: ${statusText} | Total: ${filteredStudents.length} Students`;
+
+            summary.style.display = 'flex';
+
+            if (filteredStudents.length === 0) {
+                tableContainer.innerHTML = '<p class="no-data">No students found for the selected criteria.</p>';
+                return;
+            }
+
+            // Build table
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="sno-col">S.No</th>
+                            <th class="roll-col">Roll</th>
+                            <th>Student Name</th>
+                            <th>Father's Name</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            filteredStudents.forEach((student, index) => {
+                const statusClass = student.Paid === 'YES' ? 'status-paid' : 'status-not-paid';
+                const statusText = student.Paid === 'YES' ? 'Paid' : 'Not Paid';
+                html += `
+                    <tr>
+                        <td class="sno-col">${index + 1}</td>
+                        <td class="roll-col">${student.roll2025}</td>
+                        <td>${student.name.trim()}</td>
+                        <td>${student.father_name.trim()}</td>
+                        <td class="${statusClass}">${statusText}</td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            tableContainer.innerHTML = html;
+        }
+
+        // Event listeners
+        document.getElementById('classSelect').addEventListener('change', filterStudents);
+        document.getElementById('paymentSelect').addEventListener('change', filterStudents);
+
+        // Load data on page load
+        loadData();
+    </script>
+</body>
+</html>
