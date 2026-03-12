@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Desk Slips</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f0f0f0;
+        }
+
+        /* Screen-only controls */
+        .controls {
+            padding: 15px 20px;
+            background: #1a237e;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .controls label {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .controls select, .controls button {
+            padding: 6px 14px;
+            border-radius: 4px;
+            border: none;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .controls select {
+            background: #fff;
+            color: #333;
+        }
+
+        .controls button {
+            background: #43a047;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .controls button:hover {
+            background: #2e7d32;
+        }
+
+        .controls .count {
+            margin-left: auto;
+            font-size: 13px;
+            opacity: 0.85;
+        }
+
+        /* Print page container */
+        .print-page {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 10px auto;
+            background: #fff;
+            padding: 5mm 8mm;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: repeat(5, 1fr);
+            gap: 3mm;
+            page-break-after: always;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .print-page:last-child {
+            page-break-after: auto;
+        }
+
+        /* Individual desk slip */
+        .slip {
+            border: 1.5px solid #333;
+            border-radius: 3px;
+            padding: 2mm 4mm;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slip-header {
+            text-align: center;
+            border-bottom: 1.5px solid #333;
+            padding-bottom: 1.5mm;
+            margin-bottom: 2mm;
+        }
+
+        .slip-header h3 {
+            font-size: 13pt;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #1a237e;
+        }
+
+        .slip-body {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5mm;
+        }
+
+        .slip-row {
+            display: flex;
+            align-items: baseline;
+            font-size: 12pt;
+            line-height: 1.25;
+        }
+
+        .slip-row-inline {
+            display: flex;
+            gap: 4mm;
+            font-size: 12pt;
+            line-height: 1.25;
+        }
+
+        .slip-row-inline .slip-pair {
+            display: flex;
+            align-items: baseline;
+            flex: 1;
+        }
+
+        .slip-label {
+            font-weight: 700;
+            min-width: 28mm;
+            color: #333;
+            font-size: 11pt;
+        }
+
+        .slip-row-inline .slip-label {
+            min-width: auto;
+            margin-right: 2mm;
+        }
+
+        .slip-value {
+            flex: 1;
+            font-size: 12.5pt;
+            color: #000;
+            border-bottom: 0.5px dotted #aaa;
+            padding-left: 2mm;
+        }
+
+        .class-divider {
+            grid-column: 1 / -1;
+            text-align: center;
+            font-size: 14pt;
+            font-weight: 700;
+            color: #1a237e;
+            background: #e8eaf6;
+            padding: 3mm;
+            border-radius: 4px;
+            border: 1.5px solid #1a237e;
+        }
+
+        /* Print styles */
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 0;
+            }
+
+            body {
+                background: #fff;
+            }
+
+            .controls {
+                display: none !important;
+            }
+
+            .print-page {
+                margin: 0;
+                box-shadow: none;
+                padding: 5mm 8mm;
+                width: 210mm;
+                height: 297mm;
+            }
+
+            .slip {
+                border: 1.5px solid #000;
+            }
+
+            .slip-header h3 {
+                color: #000;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="controls" id="controls">
+    <label>Filter Class:</label>
+    <select id="classFilter">
+        <option value="all">All Classes</option>
+    </select>
+    <button onclick="window.print()">🖨️ Print</button>
+    <span class="count" id="slipCount"></span>
+</div>
+
+<div id="output"></div>
+
+<script>
+let studentData = [];
+
+
+
+// Class order for sorting
+const classOrder = [
+    'LKG A', 'UKG A',
+    'I A', 'II A', 'II B',
+    'III A', 'IV A', 'V A',
+    'VI A', 'VII A', 'VIII A',
+    'IX A', 'X A'
+];
+
+function getClassRank(cls) {
+    const idx = classOrder.indexOf(cls.trim());
+    return idx === -1 ? 999 : idx;
+}
+
+// Sort: class-wise, then by roll number
+function sortStudents(students) {
+    return [...students].sort((a, b) => {
+        const classCompare = getClassRank(a.class2025) - getClassRank(b.class2025);
+        if (classCompare !== 0) return classCompare;
+        return parseInt(a.roll2025) - parseInt(b.roll2025);
+    });
+}
+
+function createSlipHTML(s) {
+    return `
+        <div class="slip">
+            <div class="slip-header">
+                <h3>Exam Desk Slip</h3>
+            </div>
+            <div class="slip-body">
+                <div class="slip-row">
+                    <span class="slip-label">Adm. No.</span>
+                    <span class="slip-value">${escapeHtml(s.adm_no)}</span>
+                </div>
+                <div class="slip-row">
+                    <span class="slip-label">Name</span>
+                    <span class="slip-value">${escapeHtml(s.name.trim())}</span>
+                </div>
+                <div class="slip-row">
+                    <span class="slip-label">Father's Name</span>
+                    <span class="slip-value">${escapeHtml(s.father_name.trim())}</span>
+                </div>
+                <div class="slip-row-inline">
+                    <div class="slip-pair">
+                        <span class="slip-label">Class</span>
+                        <span class="slip-value">${escapeHtml(s.class2025)}</span>
+                    </div>
+                    <div class="slip-pair">
+                        <span class="slip-label">Roll No.</span>
+                        <span class="slip-value">${escapeHtml(s.roll2025)}</span>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function renderSlips(filterClass) {
+    let students = filterClass === 'all'
+        ? studentData
+        : studentData.filter(s => s.class2025 === filterClass);
+
+    students = sortStudents(students);
+
+    const output = document.getElementById('output');
+    output.innerHTML = '';
+
+    document.getElementById('slipCount').textContent = `Total: ${students.length} slips`;
+
+    if (students.length === 0) {
+        output.innerHTML = '<p style="text-align:center;padding:40px;font-size:16px;">No students found.</p>';
+        return;
+    }
+
+    // Group by 10 slips per page (5 rows x 2 cols)
+    for (let i = 0; i < students.length; i += 10) {
+        const pageStudents = students.slice(i, i + 10);
+        const page = document.createElement('div');
+        page.className = 'print-page';
+
+        pageStudents.forEach(s => {
+            page.innerHTML += createSlipHTML(s);
+        });
+
+        // Fill empty slots so grid stays consistent
+        const remaining = 10 - pageStudents.length;
+        for (let j = 0; j < remaining; j++) {
+            page.innerHTML += '<div class="slip" style="border:1px dashed #ccc;opacity:0.3;"></div>';
+        }
+
+        output.appendChild(page);
+    }
+}
+
+// Populate class filter dropdown
+function populateFilter() {
+    const select = document.getElementById('classFilter');
+    const classes = [...new Set(studentData.map(s => s.class2025))];
+    classes.sort((a, b) => getClassRank(a) - getClassRank(b));
+
+    classes.forEach(cls => {
+        const opt = document.createElement('option');
+        opt.value = cls;
+        opt.textContent = cls;
+        select.appendChild(opt);
+    });
+
+    select.addEventListener('change', () => renderSlips(select.value));
+}
+
+// Load student data from student.json
+fetch('student.json')
+    .then(res => res.json())
+    .then(data => {
+        studentData = data;
+        populateFilter();
+        renderSlips('all');
+    })
+    .catch(err => {
+        console.error('Error loading student.json:', err);
+        document.getElementById('output').innerHTML =
+            '<p style="text-align:center;padding:40px;color:red;font-size:16px;">Error: Could not load student.json.<br>Please serve via a web server (e.g., Live Server in VS Code).</p>';
+    });
+</script>
+
+</body>
+</html>
